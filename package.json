@@ -19,7 +19,7 @@
     "start": "node ./src/index.js",
     "prisma:migrate": "prisma migrate dev --name ",
     "prisma:generate": "prisma generate",
-    "postinstall": "npm run prisma:generate && npm start -- init"
+    "postinstall": "npm start -- init"
   },
   "keywords": [
     "signum",
