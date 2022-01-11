@@ -64,3 +64,21 @@ Commands:
                           and sends the rewards iff so
   help [command]          display help for command
 ```
+## Examples
+
+### Siumlate Payment
+
+This will simulate a payment execution of 10 Signa.
+
+```bash
+./snr-cli.js pay 10
+```
+
+### Execute real Payment
+
+This will run a real payment execution of 3.14159 Signa and alters state in the database also
+
+```bash
+./snr-cli.js pay 3.14159 -x
+```
+
