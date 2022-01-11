@@ -39,15 +39,15 @@ const app = program
 
 program
   .command('init')
-  .description(' Initializes the command. Use this before any other action')
+  .description('Initializes the command. Use this before any other action')
   .action(initCommand)
 
 program
   .command('pay')
+  .description('Checks the node operators for payment eligibility, and sends the rewards iff so')
   .argument('<amount>', 'Amount in Signa to be paid to all eligible operators', parseFloat)
   .option('-c, --config <filename>', 'A config file with all the necessary settings', '.env')
   .option('-x, --exec', 'If set than payment will be executed for real, otherwise it checks only for eligible operators.')
-  .option('-p, --progress', 'Shows a progress bar')
   .action((amount, options) => {
     startAction({ amount, ...options }, payCommand)
   });

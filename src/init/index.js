@@ -8,14 +8,19 @@ const main = () => {
   const destination = join(envPath, '.env')
 
   if (pathExistsSync(destination)) {
-    console.info('There is an env file already at', destination)
-    console.info('Initialization skipped to avoid override')
+    console.info('There is an env file already at:')
+    console.info(destination)
+    console.info('\nInitialization skipped to avoid override')
     process.exit(1)
   }
 
+  console.info('Initializing...')
   copySync(source, destination)
-  console.info('Configuration file created at', destination)
-  console.info('Please, edit according your needs, before using any other command')
+  console.info('========================================')
+  console.info('Configuration file created at:')
+  console.info(destination)
+  console.info('\nPlease, edit according your needs, before using any other command')
+  console.info('\n✅ SUCCESS\n')
 
 }
 module.exports = {
