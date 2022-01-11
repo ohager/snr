@@ -13,11 +13,6 @@ function hasValidAddress (operator) {
   }
 }
 
-function ifActive (active, fn) {
-  if (!active) return
-  fn()
-}
-
 const MaxMultiOut = 128
 
 function calculateMultiOutFee (recipientCount) {
@@ -26,8 +21,8 @@ function calculateMultiOutFee (recipientCount) {
 }
 
 const main = async (context, opts) => {
+  console.info(new Date(), 'SNR Pay started', !opts.exec ? "DRY RUN" : "")
   const { database, ledger, config } = context
-  console.info('Pay')
   const payableOperators = await database.scan_peermonitor.findMany({
     where: {
       reward_state: 'Queued'
@@ -86,7 +81,8 @@ const main = async (context, opts) => {
   console.info(`TOTAL PAID: ${totalCosts.getSigna().toString()} (fees included)`)
   console.info(`TRANSACTIONS: ${chunkedOperators.length}`)
   console.info(`RECIPIENTS: ${legitOperators.length}`)
-  console.info('\n====================================================')
+  console.info('====================================================')
+  console.info(new Date(), 'SNR Pay finished')
 }
 module.exports = {
   main
