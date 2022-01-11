@@ -2,23 +2,29 @@
 
 Payment Application for the Signum Node Rewards (SNR)
 
+# Install
+
 > NodeJS 14+ installed
 
-This program is considered to run as a system wide installed command line tool, so install it
-globally using 
+Clone this repo and install the dependencies: 
 
-`npm i @signum/snr-cli -g`
+```bash
+git clone https://github.com/ohager/snr.git
+npm i
+```
 
 # Initialize aka Configuration
 
-Before using it you need to _configure_ the tool. On installation it tells you where
-to find the configuration file. Just set the environment variables accordingly and you should be fin.
+Before using it you need to _configure_ the tool. 
+On installation the `.env.example` will be copied to `.env` automatically.
+Just edit the `.env` file according your needs.
 
 > Hint: You can always override the ENV vars on startup, i.e. `PAYING_ACCOUNT_PASSPHRASE=secret snr pay 100 -x`   
+> Another Hint: Once the `.env` file exists, it won't be overwritten by the `init` command anymore
 
 # Usage
 
-Just hit `snr-cli --help` for detailed usage
+Just hit `./snr-cli.js --help` for detailed usage
 
 ```
 Usage: index [options] [command]
