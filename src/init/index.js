@@ -11,7 +11,7 @@ const main = () => {
     console.info('There is an env file already at:')
     console.info(destination)
     console.info('\nInitialization skipped to avoid override')
-    process.exit(1)
+    process.exit(0)
   }
 
   console.info('Initializing...')

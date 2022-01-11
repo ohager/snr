@@ -19,7 +19,7 @@
     "start": "node ./src/index.js",
     "prisma:migrate": "prisma migrate dev --name ",
     "prisma:generate": "prisma generate",
-    "postinstall": "npm start -- init"
+    "postinstall": "npm run prisma:generate && npm start -- init"
   },
   "keywords": [
     "signum",
@@ -30,7 +30,8 @@
   "author": "ohager",
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "^3.8.0",
+    "@prisma/client": "3.7.0",
+    "@signum/snr-cli": "file:signum-snr-cli-1.0.0.tgz",
     "@signumjs/core": "^1.0.0-rc.8",
     "@signumjs/crypto": "^1.0.0-rc.8",
     "@signumjs/util": "^1.0.0-rc.8",
@@ -40,7 +41,10 @@
     "lodash.chunk": "^4.2.0"
   },
   "devDependencies": {
-    "prisma": "^3.8.0",
+    "prisma": "3.7.0",
     "standard": "^16.0.4"
+  },
+  "prisma": {
+    "schema": "./prisma/schema.prisma"
   }
 }
