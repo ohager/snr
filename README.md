@@ -10,6 +10,7 @@ Clone this repo and install the dependencies:
 
 ```bash
 git clone https://github.com/ohager/snr.git
+cd snr
 npm i
 ```
 
