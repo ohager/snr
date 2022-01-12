@@ -2,16 +2,20 @@
 const semverGte = require('semver/functions/gte')
 const semverCoerce = require('semver/functions/coerce')
 const { hasValidAddress } = require('../hasValidAddress')
-
 const hasMinimumVersion = (target) => (operator) => semverGte(semverCoerce(operator.version), semverCoerce(target))
 
-const fulfillsLastSeen = (target) => (operator) => {
-  return operator.last_online_at.getTime() - target.getTime() > 0
+function asDate (dateTime) {
+  return new Date(dateTime.getUTCFullYear(), dateTime.getUTCMonth(), dateTime.getUTCDate())
+}
+
+const fulfillsLastSeen = (operator) => {
+  const today = asDate(new Date())
+  return operator.last_online_at.getTime() - today.getTime() > 0
 }
 
 const main = async (context, opts) => {
   console.info(new Date(), 'SNR Queue started')
-  const { minVersion, availability, lastSeen, exec } = opts
+  const { minVersion, availability, exec } = opts
   const { database } = context
 
   const highlyAvailableOperators = await database.scan_peermonitor.findMany({
@@ -25,7 +29,7 @@ const main = async (context, opts) => {
   const eligibleOperators = highlyAvailableOperators
     .filter(hasValidAddress)
     .filter(hasMinimumVersion(minVersion))
-    .filter(fulfillsLastSeen(lastSeen))
+    .filter(fulfillsLastSeen)
 
   if (exec) {
     const eligibleOperatorIds = eligibleOperators.map(({ announced_address }) => announced_address)

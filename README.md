@@ -28,6 +28,7 @@ Just edit the `.env` file according your needs.
 Just hit `./snr-cli.js --help` for detailed usage
 
 ```
+14:35 $ ./snr-cli.js 
 Usage: snr-cli [options] [command]
 
 
@@ -54,15 +55,15 @@ Usage: snr-cli [options] [command]
   
 
 Options:
-  -V, --version                                           output the version number
-  -h, --help                                              display help for command
+  -V, --version                                output the version number
+  -h, --help                                   display help for command
 
 Commands:
-  init                                                    Initializes the command. Use this before any other action
-  pay [options] [amount]                                  Pays the rewards to eligible node operators
-  queue [options] <minVersion> [availability] [lastSeen]  Checks the node operators for payment eligibility, and queues
-                                                          them for sending (need to use pay to execute payments)
-  help [command]                                          display help for command
+  init                                         Initializes the command. Use this before any other action
+  pay [options] [amount]                       Pays the rewards to eligible node operators
+  queue [options] <minVersion> [availability]  Checks the node operators for payment eligibility, and queues them for
+                                               sending (need to use pay to execute payments)
+  help [command]                               display help for command
 ```
 ## Examples
 
@@ -76,10 +77,10 @@ This will simulate a queue simulation for all version above '3.2' and 95% of ava
 ./snr-cli.js queue "3.2" 95 
 ```
 
-This will queue for all eligible operators with version above or equal '3.2' and 99% of availability and last seen at given date
+This will queue for all eligible operators with version above or equal '3.2' and 99% of availability
 
 ```bash
-./snr-cli.js queue "3.2.2" 99 "2020-12-30" -x
+./snr-cli.js queue "3.2.2" 99 -x
 ```
 
 
@@ -92,7 +93,6 @@ This will simulate a payment execution using the _entire_ balance of the payers 
 ```bash
 ./snr-cli.js pay
 ```
-
 
 This will simulate a payment execution of 10 Signa.
 

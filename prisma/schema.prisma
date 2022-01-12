@@ -23,6 +23,6 @@ model scan_peermonitor {
     availability Float @db.Double
     last_online_at DateTime
     modified_at DateTime
-    reward_state String @db.VarChar(255) @default("None") // "Queued", "Sent"
+    reward_state String @db.VarChar(255) @default("None") // "Queued", "Paid", "InvalidAddress"
     reward_time DateTime?
 }

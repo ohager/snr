@@ -6,17 +6,8 @@ const { main: queueCommand } = require('./queue')
 const { main: payCommand } = require('./pay')
 const { main: initCommand, assertInit } = require('./init')
 const { getContext } = require('./context')
-const { asDate } = require('./asDate')
 
 const DefaultEnv = join(__dirname, '../.env')
-
-function parseDate (dateString) {
-  const date = new Date(dateString)
-  if (isNaN(date.getTime())) {
-    throw new InvalidArgumentError('Not a date. Use YYYY-MM-DD')
-  }
-  return date
-}
 
 async function startAction (opts, fn) {
   assertInit()
@@ -74,11 +65,10 @@ program
   .description('Checks the node operators for payment eligibility, and queues them for sending (need to use pay to execute payments)')
   .argument('<minVersion>', 'The minimum version for being eligible [following semantic versioning]')
   .argument('[availability]', 'The minimum availability in percent (0 - 100) for being eligible', parseFloat, 99)
-  .argument('[lastSeen]', 'The last date when node was seen', parseDate, asDate(new Date()))
   .option('-c, --config <filename>', 'A config file with all the necessary settings', DefaultEnv)
   .option('-x, --exec', 'If set than queuing will be executed for real, otherwise it checks only for eligible operators.')
-  .action((minVersion, availability, lastSeen, options) => {
-    startAction({ minVersion, availability, lastSeen: asDate(lastSeen), ...options }, queueCommand)
+  .action((minVersion, availability, options) => {
+    startAction({ minVersion, availability, ...options }, queueCommand)
   });
 
 (async () => {
