@@ -17,8 +17,7 @@ const EpsilonAmount = Amount.fromSigna(0.1)
 const MaxMultiOut = 128
 
 function calculateMultiOutFee (recipientCount) {
-  const factor = Math.ceil(recipientCount / MaxMultiOut)
-
+  const factor = Math.ceil((recipientCount / MaxMultiOut) * 6)
   return Amount.fromPlanck(FeeQuantPlanck).multiply(factor)
 }
 
@@ -120,5 +119,7 @@ const main = async (context, opts) => {
   console.info(new Date(), 'SNR Pay finished')
 }
 module.exports = {
-  main
+  main,
+  calculateMultiOutFee,
+  calculateDistributionAmount
 }
