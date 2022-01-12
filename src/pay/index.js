@@ -19,7 +19,7 @@ function hasValidAddress (operator) {
 }
 
 const EpsilonAmount = Amount.fromSigna(0.1)
-const MaxMultiOut = 60
+const MaxMultiOut = 32
 
 function calculateMultiOutFee (recipientCount) {
   const factor = Math.ceil(((recipientCount * 8) / 1024) * 6)
@@ -82,7 +82,7 @@ const main = async (context, opts) => {
     const recipientCount = operators.length
     const recipientIds = operators.map(({ platform }) => Address.fromReedSolomonAddress(platform).getNumericId())
     const fee = calculateMultiOutFee(recipientCount)
-    totalCosts.add(amount.clone()).add(fee)
+    totalCosts.add(amount.clone().multiply(recipientCount)).add(fee)
     try {
       if (opts.exec) {
         const transactionId = await ledger.transaction.sendSameAmountToMultipleRecipients(
@@ -126,7 +126,8 @@ const main = async (context, opts) => {
   } else {
     console.info('✅ SUCCESS')
   }
-  console.info(`TOTAL PAID: ${totalCosts.getSigna().toString()} (fees included)`)
+  // next line is a workaround for a small bug in signumjs
+  console.info(`TOTAL PAID: ${totalCosts} (fees included)`)
   console.info(`TRANSACTIONS: ${chunkedOperators.length}`)
   console.info(`RECIPIENTS: ${legitOperators.length}`)
   console.info('====================================================')
