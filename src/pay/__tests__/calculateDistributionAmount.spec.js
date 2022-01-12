@@ -18,9 +18,9 @@ describe('calculateDistributionAmount', () => {
     ]
 
     const Balance = Amount.fromSigna(100)
-    expect(calculateDistributionAmount(Balance, MockedPayees10, 5).getSigna()).toBe('9.98118')
-    expect(calculateDistributionAmount(Balance, MockedPayees20, 8).getSigna()).toBe('4.9894875')
-    expect(calculateDistributionAmount(Balance, MockedPayees50, 6).getSigna()).toBe('1.99065')
+    expect(calculateDistributionAmount(Balance, MockedPayees10, 5).getSigna()).toBe('9.98853')
+    expect(calculateDistributionAmount(Balance, MockedPayees20, 8).getSigna()).toBe('4.9938975')
+    expect(calculateDistributionAmount(Balance, MockedPayees50, 6).getSigna()).toBe('1.996677')
   })
   it('should throw error on zero payees', () => {
     const Balance = Amount.fromSigna(100)
