@@ -13,11 +13,22 @@ function hasValidAddress (operator) {
   }
 }
 
+const EpsilonAmount = Amount.fromSigna(0.1)
 const MaxMultiOut = 128
 
 function calculateMultiOutFee (recipientCount) {
   const factor = Math.ceil(recipientCount / MaxMultiOut)
+
   return Amount.fromPlanck(FeeQuantPlanck).multiply(factor)
+}
+
+function calculateDistributionAmount (balanceAmount, payees) {
+  const chunkedOperators = chunk(payees, MaxMultiOut)
+  const availableAmount = balanceAmount.clone().subtract(EpsilonAmount) // reserve some Signa
+  for (const operators of chunkedOperators) { // represents number of tx
+    availableAmount.subtract(calculateMultiOutFee(operators.length))
+  }
+  return availableAmount.divide(payees.length)
 }
 
 const main = async (context, opts) => {
@@ -43,8 +54,13 @@ const main = async (context, opts) => {
   }
 
   const legitOperators = payableOperators.filter(hasValidAddress)
-  const amount = Amount.fromSigna(opts.amount)
   const keys = generateMasterKeys(config.passphrase)
+  let amount = Amount.fromSigna(opts.amount || 0)
+  if (amount.lessOrEqual(EpsilonAmount)) {
+    const payerId = Address.fromPublicKey(keys.publicKey).getNumericId()
+    const { balanceNQT } = await ledger.account.getAccountBalance(payerId)
+    amount = calculateDistributionAmount(Amount.fromPlanck(balanceNQT), legitOperators)
+  }
   const chunkedOperators = chunk(legitOperators, MaxMultiOut)
   const totalCosts = Amount.Zero()
   let hadAtLeastOneError = false

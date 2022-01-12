@@ -62,7 +62,7 @@ program
 program
   .command('pay')
   .description('Pays the rewards to eligible node operators')
-  .argument('<amount>', 'Amount in Signa to be paid to all eligible operators', parseFloat)
+  .argument('[amount]', 'Amount in Signa to be paid to all eligible operators - if not given: the entire balance of the paying account will be distributed', parseFloat)
   .option('-c, --config <filename>', 'A config file with all the necessary settings', DefaultEnv)
   .option('-x, --exec', 'If set than payment will be executed for real, otherwise it checks only for potential payments.')
   .action((amount, options) => {

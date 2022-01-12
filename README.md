@@ -59,7 +59,7 @@ Options:
 
 Commands:
   init                                                    Initializes the command. Use this before any other action
-  pay [options] <amount>                                  Pays the rewards to eligible node operators
+  pay [options] [amount]                                  Pays the rewards to eligible node operators
   queue [options] <minVersion> [availability] [lastSeen]  Checks the node operators for payment eligibility, and queues
                                                           them for sending (need to use pay to execute payments)
   help [command]                                          display help for command
@@ -86,6 +86,13 @@ This will queue for all eligible operators with version above or equal '3.2' and
 ### Payment
 
 Pays out to all 'Queued' operators.
+
+This will simulate a payment execution using the _entire_ balance of the payers account and disitributes to the operators
+
+```bash
+./snr-cli.js pay
+```
+
 
 This will simulate a payment execution of 10 Signa.
 
