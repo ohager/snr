@@ -4,8 +4,9 @@ const chunk = require('lodash.chunk')
 const { FeeQuantPlanck, Amount } = require('@signumjs/util')
 const { generateMasterKeys } = require('@signumjs/crypto')
 
-function chopFraction(amountString){
-  return amountString.substr(0, amountString.indexOf('.'))
+function chopFraction (amountString) {
+  const found = amountString.indexOf('.')
+  return found !== -1 ? amountString.substr(0, amountString.indexOf('.')) : amountString
 }
 
 function hasValidAddress (operator) {
