@@ -14,6 +14,7 @@
   },
   "main": "./src/index.js",
   "scripts": {
+    "test": "jest",
     "format": "standard",
     "format:fix": "standard --fix",
     "start": "node ./src/index.js",

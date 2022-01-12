@@ -16,16 +16,26 @@ function hasValidAddress (operator) {
 const EpsilonAmount = Amount.fromSigna(0.1)
 const MaxMultiOut = 128
 
-function calculateMultiOutFee (recipientCount) {
-  const factor = Math.ceil((recipientCount / MaxMultiOut) * 6)
+function calculateMultiOutFee (recipientCount, maxPayeesPerTx = MaxMultiOut) {
+  const factor = Math.ceil((recipientCount / maxPayeesPerTx) * 6)
   return Amount.fromPlanck(FeeQuantPlanck).multiply(factor)
 }
 
-function calculateDistributionAmount (balanceAmount, payees) {
-  const chunkedOperators = chunk(payees, MaxMultiOut)
+function calculateDistributionAmount (balanceAmount, payees, maxPayeesPerTx = MaxMultiOut) {
+
+  if (balanceAmount.lessOrEqual(EpsilonAmount)) {
+    throw Error(`Too little balance on payers account: ${balanceAmount.getSigna()}`)
+  }
+
+  if (!payees.length) {
+    throw Error('No payee available')
+  }
+
   const availableAmount = balanceAmount.clone().subtract(EpsilonAmount) // reserve some Signa
+  const chunkedOperators = chunk(payees, maxPayeesPerTx)
   for (const operators of chunkedOperators) { // represents number of tx
-    availableAmount.subtract(calculateMultiOutFee(operators.length))
+    const txFee = calculateMultiOutFee(operators.length, maxPayeesPerTx)
+    availableAmount.subtract(txFee)
   }
   return availableAmount.divide(payees.length)
 }
@@ -60,6 +70,7 @@ const main = async (context, opts) => {
     const { balanceNQT } = await ledger.account.getAccountBalance(payerId)
     amount = calculateDistributionAmount(Amount.fromPlanck(balanceNQT), legitOperators)
   }
+
   const chunkedOperators = chunk(legitOperators, MaxMultiOut)
   const totalCosts = Amount.Zero()
   let hadAtLeastOneError = false
