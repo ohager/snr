@@ -19,7 +19,7 @@ function hasValidAddress (operator) {
 }
 
 const EpsilonAmount = Amount.fromSigna(0.1)
-const MaxMultiOut = 32
+const MaxMultiOut = 128
 
 function calculateMultiOutFee (recipientCount) {
   const factor = Math.ceil(((recipientCount * 8) / 1024) * 6)
@@ -44,14 +44,26 @@ function calculateDistributionAmount (balanceAmount, payees, maxPayeesPerTx = Ma
   return availableAmount.divide(payees.length)
 }
 
+function dedupeByAddress (payableOperators) {
+  const uniqueAddresses = new Map()
+  for (const op of payableOperators) {
+    if (!uniqueAddresses.has(op.platform)) {
+      uniqueAddresses.set(op.platform, op)
+    }
+  }
+  return Array.from(uniqueAddresses.values())
+}
+
 const main = async (context, opts) => {
   console.info(new Date(), 'SNR Pay started', !opts.exec ? 'DRY RUN' : '')
   const { database, ledger, config } = context
-  const payableOperators = await database.scan_peermonitor.findMany({
+  let payableOperators = await database.scan_peermonitor.findMany({
     where: {
       reward_state: 'Queued'
     }
   })
+
+  payableOperators = dedupeByAddress(payableOperators)
 
   const invalidOperatorIds = payableOperators.filter(op => !hasValidAddress(op)).map(({ announced_address }) => announced_address)
   if (invalidOperatorIds.length) {
