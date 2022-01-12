@@ -76,14 +76,13 @@ const main = async (context, opts) => {
   }
 
   const chunkedOperators = chunk(legitOperators, MaxMultiOut)
-  const totalCosts = Amount.Zero()
+  const totalCosts = amount.clone()
   let hadAtLeastOneError = false
   for (const operators of chunkedOperators) {
     const recipientCount = operators.length
     const recipientIds = operators.map(({ platform }) => Address.fromReedSolomonAddress(platform).getNumericId())
     const fee = calculateMultiOutFee(recipientCount)
-    const chunkedAmount = amount.clone().multiply(recipientCount).add(fee)
-    totalCosts.add(chunkedAmount)
+    totalCosts.add(fee)
     try {
       if (opts.exec) {
         const transactionId = await ledger.transaction.sendSameAmountToMultipleRecipients(
