@@ -4,6 +4,10 @@ const chunk = require('lodash.chunk')
 const { FeeQuantPlanck, Amount } = require('@signumjs/util')
 const { generateMasterKeys } = require('@signumjs/crypto')
 
+function chopFraction(amountString){
+  return amountString.substr(0, amountString.indexOf('.'))
+}
+
 function hasValidAddress (operator) {
   try {
     Address.fromReedSolomonAddress(operator.platform)
@@ -78,12 +82,13 @@ const main = async (context, opts) => {
     const recipientCount = operators.length
     const recipientIds = operators.map(({ platform }) => Address.fromReedSolomonAddress(platform).getNumericId())
     const fee = calculateMultiOutFee(recipientCount)
-    totalCosts.add(amount).multiply(recipientCount).add(fee)
+    const chunkedAmount = amount.clone().multiply(recipientCount).add(fee)
+    totalCosts.add(chunkedAmount)
     try {
       if (opts.exec) {
         const transactionId = await ledger.transaction.sendSameAmountToMultipleRecipients(
-          amount.getPlanck(),
-          fee.getPlanck(),
+          chopFraction(amount.getPlanck()),
+          chopFraction(fee.getPlanck()),
           recipientIds,
           keys.publicKey,
           keys.signPrivateKey
