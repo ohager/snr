@@ -28,7 +28,7 @@ Just edit the `.env` file according your needs.
 Just hit `./snr-cli.js --help` for detailed usage
 
 ```
-Usage: index [options] [command]
+Usage: snr-cli [options] [command]
 
 
             @@@@@@@@  @@@@@@@           
@@ -50,31 +50,48 @@ Usage: index [options] [command]
            Signum Node Rewards          
       
   Author: ohager
-  Version: 1.0.0
+  Version: 1.1.0
   
 
 Options:
-  -V, --version           output the version number
-  -h, --help              display help for command
+  -V, --version                                           output the version number
+  -h, --help                                              display help for command
 
 Commands:
-  init                    Initializes the command. Use this before any other
-                          action
-  pay [options] <amount>  Checks the node operators for payment eligibility,
-                          and sends the rewards iff so
-  help [command]          display help for command
+  init                                                    Initializes the command. Use this before any other action
+  pay [options] <amount>                                  Pays the rewards to eligible node operators
+  queue [options] <minVersion> [availability] [lastSeen]  Checks the node operators for payment eligibility, and queues
+                                                          them for sending (need to use pay to execute payments)
+  help [command]                                          display help for command
 ```
 ## Examples
 
-### Siumlate Payment
+### Queue
+
+Queuing is the process to verify if an operator is eligible. It just sets the elgibile operator to 'Queued', such that the payment can be done afterwards.
+
+This will simulate a queue simulation for all version above '3.2' and 95% of availability and last seen today
+
+```bash
+./snr-cli.js queue "3.2" 95 
+```
+
+This will queue for all eligible operators with version above or equal '3.2' and 99% of availability and last seen at given date
+
+```bash
+./snr-cli.js queue "3.2.2" 99 "2020-12-30" -x
+```
+
+
+### Payment
+
+Pays out to all 'Queued' operators.
 
 This will simulate a payment execution of 10 Signa.
 
 ```bash
 ./snr-cli.js pay 10
 ```
-
-### Execute real Payment
 
 This will run a real payment execution of 3.14159 Signa and alters state in the database also
 

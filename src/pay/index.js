@@ -6,7 +6,7 @@ const { generateMasterKeys } = require('@signumjs/crypto')
 
 function hasValidAddress (operator) {
   try {
-    Address.fromReedSolomonAddress(operator.announced_address)
+    Address.fromReedSolomonAddress(operator.platform)
     return true
   } catch (e) {
     return false
@@ -21,13 +21,26 @@ function calculateMultiOutFee (recipientCount) {
 }
 
 const main = async (context, opts) => {
-  console.info(new Date(), 'SNR Pay started', !opts.exec ? "DRY RUN" : "")
+  console.info(new Date(), 'SNR Pay started', !opts.exec ? 'DRY RUN' : '')
   const { database, ledger, config } = context
   const payableOperators = await database.scan_peermonitor.findMany({
     where: {
       reward_state: 'Queued'
     }
   })
+
+  const invalidOperatorIds = payableOperators.filter(op => !hasValidAddress(op)).map(({ announced_address }) => announced_address)
+  if (invalidOperatorIds.length) {
+    await database.scan_peermonitor.updateMany({
+      where: {
+        announced_address: { in: invalidOperatorIds }
+      },
+      data: {
+        reward_state: 'InvalidAddress',
+        reward_time: null
+      }
+    })
+  }
 
   const legitOperators = payableOperators.filter(hasValidAddress)
   const amount = Amount.fromSigna(opts.amount)
@@ -37,8 +50,7 @@ const main = async (context, opts) => {
   let hadAtLeastOneError = false
   for (const operators of chunkedOperators) {
     const recipientCount = operators.length
-    const recipientIds = operators.map(({ announced_address }) => Address.fromReedSolomonAddress(announced_address).getNumericId())
-    const recipientAddresses = operators.map(({ announced_address }) => announced_address)
+    const recipientIds = operators.map(({ platform }) => Address.fromReedSolomonAddress(platform).getNumericId())
     const fee = calculateMultiOutFee(recipientCount)
     totalCosts.add(amount).multiply(recipientCount).add(fee)
     try {
@@ -50,21 +62,28 @@ const main = async (context, opts) => {
           keys.publicKey,
           keys.signPrivateKey
         )
+
+        const ids = operators.map(({ announced_address }) => announced_address)
         await database.scan_peermonitor.updateMany({
           where: {
-            announced_address: { in: recipientAddresses }
+            announced_address: { in: ids }
           },
           data: {
-            reward_state: 'Sent',
+            reward_state: 'Paid',
             reward_time: new Date()
           }
         })
         console.info('\nSuccessfully sent:', transactionId)
       } else {
+
+        console.info('\n===========================================')
+        console.info('                  DRY RUN')
+        console.info('===========================================')
+
         await Promise.resolve() // dummy op
         console.info(`\nWould have sent ${amount.getSigna().toString()} (Fee: ${fee.getSigna().toString()}) to:`)
         // eslint-disable-next-line camelcase
-        console.table(operators.map(({ announced_address }) => announced_address))
+        console.table(operators.map(({ platform }) => platform))
       }
     } catch (e) {
       console.error('⚠ - Failure:', e)
