@@ -41,7 +41,7 @@ function calculateDistributionAmount (balanceAmount, payees, maxPayeesPerTx = Ma
     const txFee = calculateMultiOutFee(operators.length, maxPayeesPerTx)
     availableAmount.subtract(txFee)
   }
-  return availableAmount.divide(payees.length)
+  return availableAmount.divide(chunkedOperators.length)
 }
 
 const main = async (context, opts) => {
