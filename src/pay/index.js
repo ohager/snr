@@ -27,7 +27,6 @@ function calculateMultiOutFee (recipientCount, maxPayeesPerTx = MaxMultiOut) {
 }
 
 function calculateDistributionAmount (balanceAmount, payees, maxPayeesPerTx = MaxMultiOut) {
-
   if (balanceAmount.lessOrEqual(EpsilonAmount)) {
     throw Error(`Too little balance on payers account: ${balanceAmount.getSigna()}`)
   }
@@ -107,7 +106,6 @@ const main = async (context, opts) => {
         })
         console.info('\nSuccessfully sent:', transactionId)
       } else {
-
         console.info('\n===========================================')
         console.info('                  DRY RUN')
         console.info('===========================================')
