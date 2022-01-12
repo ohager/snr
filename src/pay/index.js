@@ -21,9 +21,8 @@ function hasValidAddress (operator) {
 const EpsilonAmount = Amount.fromSigna(0.1)
 const MaxMultiOut = 60
 
-function calculateMultiOutFee (recipientCount, maxPayeesPerTx = MaxMultiOut) {
-  // this is not 100% correct
-  const factor = Math.ceil((recipientCount / maxPayeesPerTx) * 6)
+function calculateMultiOutFee (recipientCount) {
+  const factor = Math.ceil(((recipientCount * 8) / 1024) * 6)
   return Amount.fromPlanck(FeeQuantPlanck).multiply(factor)
 }
 
@@ -39,7 +38,7 @@ function calculateDistributionAmount (balanceAmount, payees, maxPayeesPerTx = Ma
   const availableAmount = balanceAmount.clone().subtract(EpsilonAmount) // reserve some Signa
   const chunkedOperators = chunk(payees, maxPayeesPerTx)
   for (const operators of chunkedOperators) { // represents number of tx
-    const txFee = calculateMultiOutFee(operators.length, maxPayeesPerTx)
+    const txFee = calculateMultiOutFee(operators.length)
     availableAmount.subtract(txFee)
   }
   return availableAmount.divide(payees.length)
