@@ -13,6 +13,19 @@ const fulfillsLastSeen = (operator) => {
   return operator.last_online_at.getTime() - today.getTime() > 0
 }
 
+function findDuplicateOperatorIds (operators) {
+  const addresses = new Set()
+  const duplicates = []
+  for (const op of operators) {
+    if (addresses.has(op.platform)) {
+      duplicates.push(op.announced_address)
+    } else {
+      addresses.add(op.platform)
+    }
+  }
+  return duplicates
+}
+
 const main = async (context, opts) => {
   console.info(new Date(), 'SNR Queue started')
   const { minVersion, availability, exec } = opts
@@ -26,13 +39,19 @@ const main = async (context, opts) => {
     }
   })
 
-  const eligibleOperators = highlyAvailableOperators
+  let eligibleOperators = highlyAvailableOperators
     .filter(hasValidAddress)
     .filter(hasMinimumVersion(minVersion))
     .filter(fulfillsLastSeen)
 
+  const duplicateOperatorIds = findDuplicateOperatorIds(eligibleOperators)
+
+  eligibleOperators = eligibleOperators
+    .filter(({ announced_address }) => !duplicateOperatorIds.includes(announced_address))
+
   if (exec) {
-    const eligibleOperatorIds = eligibleOperators.map(({ announced_address }) => announced_address)
+    const eligibleOperatorIds = eligibleOperators
+      .map(({ announced_address }) => announced_address)
     await database.scan_peermonitor.updateMany({
       where: {
         announced_address: {
@@ -43,12 +62,27 @@ const main = async (context, opts) => {
         reward_state: 'Queued'
       }
     })
+    await database.scan_peermonitor.updateMany({
+      where: {
+        announced_address: {
+          in: duplicateOperatorIds
+        }
+      },
+      data: {
+        reward_state: 'Duplicate'
+      }
+    })
   }
 
   if (!exec) {
     console.info('\n===========================================')
     console.info('                  DRY RUN')
     console.info('===========================================')
+  }
+
+  if (duplicateOperatorIds) {
+    console.info('\n\n Found the following duplicates')
+    console.table(duplicateOperatorIds.map(id => ({ announcedAddress: id })))
   }
 
   console.info('\n\n Queueing the following operators')
