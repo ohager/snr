@@ -6,7 +6,7 @@ while :
 do
     SECS=$(expr `date -d "tomorrow $WAKEUP" +%s` - `date -d "now" +%s`)
     echo "`date +"%Y-%m-%d %T"`| Will sleep for $SECS seconds."
-    sleep $SECS &  # We sleep in the background to make the screipt interruptible
+    sleep $SECS &  # We sleep in the background to make the script interruptible
     wait $!
     echo "`date +"%Y-%m-%d %T"`| Waking up"
     
