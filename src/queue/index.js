@@ -8,19 +8,26 @@ function asDate (dateTime) {
   return new Date(dateTime.getUTCFullYear(), dateTime.getUTCMonth(), dateTime.getUTCDate())
 }
 
-const fulfillsLastSeen = (operator) => {
+const lastSeenToday = (operator) => {
   const today = asDate(new Date())
   return operator.last_online_at.getTime() - today.getTime() > 0
 }
 
-function findDuplicateOperatorIds (operators) {
+function findDuplicates (operators) {
+  const platforms = new Set()
   const addresses = new Set()
+  const ips = new Set()
   const duplicates = []
   for (const op of operators) {
-    if (addresses.has(op.platform)) {
-      duplicates.push(op.announced_address)
+    if (platforms.has(op.platform) ||
+      addresses.has(op.announced_address) ||
+      ips.has(op.real_ip)
+    ) {
+      duplicates.push(op.id)
     } else {
-      addresses.add(op.platform)
+      platforms.add(op.platform)
+      addresses.add(op.announced_address)
+      ips.add(op.real_ip)
     }
   }
   return duplicates
@@ -42,20 +49,20 @@ const main = async (context, opts) => {
   let eligibleOperators = highlyAvailableOperators
     .filter(hasValidAddress)
     .filter(hasMinimumVersion(minVersion))
-    .filter(fulfillsLastSeen)
+    // .filter(lastSeenToday)
 
-  const duplicateOperatorIds = findDuplicateOperatorIds(eligibleOperators)
+  const duplicates = findDuplicates(eligibleOperators)
 
   eligibleOperators = eligibleOperators
-    .filter(({ announced_address }) => !duplicateOperatorIds.includes(announced_address))
+    .filter(({ id }) => !duplicates.includes(id))
 
   if (exec) {
-    const eligibleOperatorIds = eligibleOperators
-      .map(({ announced_address }) => announced_address)
+    const eligibleIds = eligibleOperators
+      .map(({ id }) => id)
     await database.scan_peermonitor.updateMany({
       where: {
-        announced_address: {
-          in: eligibleOperatorIds
+        id: {
+          in: eligibleIds
         }
       },
       data: {
@@ -64,8 +71,8 @@ const main = async (context, opts) => {
     })
     await database.scan_peermonitor.updateMany({
       where: {
-        announced_address: {
-          in: duplicateOperatorIds
+        id: {
+          in: duplicates
         }
       },
       data: {
@@ -80,13 +87,14 @@ const main = async (context, opts) => {
     console.info('===========================================')
   }
 
-  if (duplicateOperatorIds) {
+  if (duplicates) {
     console.info('\n\n Found the following duplicates')
-    console.table(duplicateOperatorIds.map(id => ({ announcedAddress: id })))
+    console.table(duplicates.map(id => ({ id })))
   }
 
   console.info('\n\n Queueing the following operators')
   console.table(eligibleOperators.map(o => ({
+    id: o.id,
     announcedAddress: o.announced_address,
     platform: o.platform,
     version: o.version,

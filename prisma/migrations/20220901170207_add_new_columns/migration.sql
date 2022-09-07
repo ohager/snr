@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `scan_peermonitor` ADD COLUMN `country_code` VARCHAR(191) NOT NULL DEFAULT '',
+    ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);

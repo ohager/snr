@@ -11,7 +11,9 @@ datasource db {
 }
 
 model scan_peermonitor {
-    announced_address String @id @db.VarChar(255)
+    id Int @id @default(autoincrement())
+    announced_address String @db.VarChar(255)
+    real_ip String? @db.VarChar(255)
     platform String @db.VarChar(255)
     application String @db.VarChar(255)
     version String @db.VarChar(255)
@@ -25,4 +27,6 @@ model scan_peermonitor {
     modified_at DateTime
     reward_state String @db.VarChar(255) @default("None") // "Queued", "Paid", "InvalidAddress"
     reward_time DateTime?
+    country_code String @default("")
+    created_at DateTime @default(now())
 }
