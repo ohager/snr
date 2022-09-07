@@ -16,13 +16,18 @@ const lastSeenToday = (operator) => {
 function findDuplicates (operators) {
   const platforms = new Set()
   const addresses = new Set()
+  const ips = new Set()
   const duplicates = []
   for (const op of operators) {
-    if (platforms.has(op.platform) || addresses.has(op.announced_address)) {
+    if (platforms.has(op.platform) ||
+      addresses.has(op.announced_address) ||
+      ips.has(op.real_ip)
+    ) {
       duplicates.push(op.id)
     } else {
       platforms.add(op.platform)
       addresses.add(op.announced_address)
+      ips.add(op.real_ip)
     }
   }
   return duplicates
@@ -44,7 +49,7 @@ const main = async (context, opts) => {
   let eligibleOperators = highlyAvailableOperators
     .filter(hasValidAddress)
     .filter(hasMinimumVersion(minVersion))
-    .filter(lastSeenToday)
+    // .filter(lastSeenToday)
 
   const duplicates = findDuplicates(eligibleOperators)
 
