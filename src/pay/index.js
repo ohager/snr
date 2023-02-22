@@ -23,7 +23,7 @@ const MaxMultiOut = 128
 
 function calculateMultiOutFee (recipientCount) {
   const factor = Math.ceil(((recipientCount * 8) / 1024) * 6)
-  return Amount.fromPlanck(FeeQuantPlanck).multiply(factor)
+  return Amount.fromSigna(0.01).multiply(factor)
 }
 
 function calculateDistributionAmount (balanceAmount, payees, maxPayeesPerTx = MaxMultiOut) {

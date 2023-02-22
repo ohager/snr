@@ -19,15 +19,17 @@ function findDuplicates (operators) {
   const ips = new Set()
   const duplicates = []
   for (const op of operators) {
+    const ip = op.real_ip
+    const only3 = ip.substr(0, ip.lastIndexOf('.'))
     if (platforms.has(op.platform) ||
       addresses.has(op.announced_address) ||
-      ips.has(op.real_ip)
+      ips.has(only3)
     ) {
       duplicates.push(op.id)
     } else {
       platforms.add(op.platform)
       addresses.add(op.announced_address)
-      ips.add(op.real_ip)
+      ips.add(only3)
     }
   }
   return duplicates
