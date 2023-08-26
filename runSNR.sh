@@ -11,7 +11,7 @@ do
     echo "`date +"%Y-%m-%d %T"`| Waking up"
     
     # Check that nodes meet requirements X.X.X (version) XX (uptime %)
-    /home/signum/Signum_Apps/snr/snr-cli.js queue 3.4.1 80 -x
+    /home/signum/Signum_Apps/snr/snr-cli.js queue 3.7.0 80 -x
     wait
     # Pay everyone that passed check above
     /home/signum/Signum_Apps/snr/snr-cli.js pay -x
